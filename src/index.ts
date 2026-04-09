@@ -4,7 +4,7 @@ import 'dotenv/config';
 const app = express();
 const port = +(process.env.PORT ?? 3000)
 
-const appVersion = process.env.VERSION || 'v3';
+const appVersion = process.env.APP_VERSION;
 const environment = process.env.NODE_ENV ?? 'development';
 
 app.get('/', (_req, res) => {
@@ -21,7 +21,11 @@ app.get('/health', (_req, res) => {
   });
 });
 
-app.listen(port, '0.0.0.0', () => {
-  console.log(`Server running on http://0.0.0.0:${port}`);
-  console.log(`Public IP should be accessible at ${process.env.PUBLIC_IP || 'localhost'}:${port} `);
-});
+export default app;
+
+// Only start server if file is run directly (not imported in tests)
+if (require.main === module) {
+  app.listen(port, '0.0.0.0', () => {
+    console.log(`Server running on port ${port} in ${environment} mode`);
+  });
+}
