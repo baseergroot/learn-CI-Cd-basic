@@ -1,0 +1,33 @@
+name: Deploy to Azure VM
+
+# Trigger the workflow on every push to the main branch
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    # Run this job on a GitHub-hosted Ubuntu machine
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout (download) the latest code from your repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+
+      # Step 3: Deploy to your server using SSH
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}          # Your VM public IP
+          username: ${{ secrets.SERVER_USER }}      # Usually "azureuser"
+          key: ${{ secrets.SSH_PRIVATE_KEY }}       # Your private SSH key
+          script: |
+            cd ~/workspace/learn-CI-Cd-basic
+            git pull origin main
+            pnpm install --frozen-lockfile
+            pnpm build
+            pm2 restart ci/cd-app
+            pm2 save
+            echo "Deployment completed at $(date)"
