@@ -4,18 +4,20 @@ import 'dotenv/config';
 const app = express();
 const port = +(process.env.PORT ?? 3000)
 
-const version = process.env.VERSION || 'v3';
+const appVersion = process.env.VERSION || 'v3';
+const environment = process.env.NODE_ENV ?? 'development';
 
 app.get('/', (_req, res) => {
-  res.send(`<h1> hello it work ${version} with CI/CD </h1>`);
+  res.send(`<h1>Hello from ${environment} environment - Version ${appVersion}</h1>`);
 });
 
 app.get('/health', (_req, res) => {
   res.status(200).json({
     status: 'healthy',
     message: 'App is running fine',
+    environment,
     timestamp: new Date(),
-    version
+    version: appVersion
   });
 });
 
